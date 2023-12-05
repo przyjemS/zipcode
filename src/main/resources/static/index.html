@@ -1,0 +1,138 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Zipcode Search</title>-->
+<!--    <link rel="stylesheet" href="style.css"> &lt;!&ndash; Link to your CSS file &ndash;&gt;-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<div class="container">-->
+<!--    <h1>Zipcode Search</h1>-->
+<!--    <div class="search-box">-->
+<!--        <input type="text" id="zipcode" placeholder="Enter zipcode" value="67-400">-->
+<!--        <button onclick="searchZipcode()">Search</button>-->
+<!--    </div>-->
+<!--    <div id="results" class="results"></div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    function searchZipcode() {-->
+<!--        const zipcode = document.getElementById('zipcode').value;-->
+<!--        const resultsElement = document.getElementById('results');-->
+<!--        resultsElement.innerHTML = ''; // Clear previous results-->
+<!--        resultsElement.classList.add('loading');-->
+
+<!--        fetch(`http://localhost:8080/zipcode/${zipcode}`)-->
+<!--            .then(response => {-->
+<!--                if (!response.ok) {-->
+<!--                    throw new Error('Network response was not ok ' + response.statusText);-->
+<!--                }-->
+<!--                return response.json();-->
+<!--            })-->
+<!--            .then(data => {-->
+<!--                resultsElement.classList.remove('loading');-->
+<!--                if (data.results && data.results[zipcode]) {-->
+<!--                    const locations = data.results[zipcode];-->
+<!--                    locations.forEach(location => {-->
+<!--                        if (location.country_code) {-->
+<!--                            const resultItem = `-->
+<!--                                        <div class="location">-->
+<!--                                            <h2>${location.city}</h2>-->
+<!--                                            <p>State: <strong>${location.state}</strong></p>-->
+<!--                                            <p>Country code: <strong>${location.country_code}</strong></p>-->
+<!--                                            <p>Latitude: <strong>${location.latitude}</strong></p>-->
+<!--                                            <p>Longitude: <strong>${location.longitude}</strong></p>-->
+<!--                                        </div>-->
+<!--                                    `;-->
+<!--                            resultsElement.innerHTML += resultItem;-->
+<!--                        }-->
+<!--                    });-->
+<!--                } else {-->
+<!--                    resultsElement.innerHTML = '<p>No results found</p>';-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error('There has been a problem with your fetch operation:', error);-->
+<!--                resultsElement.classList.remove('loading');-->
+<!--                resultsElement.innerHTML = '<p>Error fetching results</p>';-->
+<!--            });-->
+
+<!--        function addResultInteractivity() {-->
+<!--            const resultItems = document.querySelectorAll('.location');-->
+<!--            resultItems.forEach(item => {-->
+<!--                item.addEventListener('mouseover', () => {-->
+<!--                    item.style.backgroundColor = '#def';-->
+<!--                });-->
+<!--                item.addEventListener('mouseout', () => {-->
+<!--                    item.style.backgroundColor = '';-->
+<!--                });-->
+<!--            });-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zipcode Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1 class="title">Zipcode Search</h1>
+    <div id="zipcode-form">
+        <input type="text" id="zipcode" placeholder="Enter zipcode" value="67-400">
+        <button onclick="searchZipcode()">Search</button>
+    </div>
+    <div id="results"></div>
+</div>
+<script>
+    function searchZipcode() {
+        const zipcode = document.getElementById('zipcode').value;
+        const resultsElement = document.getElementById('results');
+        resultsElement.innerHTML = ''; // Clear previous results
+
+        fetch(`http://localhost:8080/zipcode/${zipcode}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.results && data.results[zipcode]) {
+                    const locations = data.results[zipcode];
+                    locations.forEach((location, index) => {
+                        const resultItem = document.createElement('div');
+                        resultItem.classList.add('location');
+                        resultItem.innerHTML = `
+                                <p>City: ${location.city}</p>
+                                <p>State: ${location.state}</p>
+                                <p>Country code: ${location.country_code}</p>
+                                <p>Latitude: ${location.latitude}</p>
+                                <p>Longitude: ${location.longitude}</p>
+                            `;
+                        // Delay each item's animation slightly based on its index
+                        resultItem.style.animationDelay = `${index * 100}ms`;
+                        resultsElement.appendChild(resultItem);
+                    });
+                } else {
+                    resultsElement.innerHTML = '<p class="no-results">No results found</p>';
+                }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+                resultsElement.innerHTML = '<p class="no-results">Error fetching results</p>';
+            });
+    }
+</script>
+</body>
+</html>
+
